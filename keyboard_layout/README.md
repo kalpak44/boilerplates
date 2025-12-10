@@ -5,9 +5,9 @@ The layout mirrors the English keyboard as closely as possible while covering th
 
 Each platform folder includes installation instructions and packaged layout files.
 
+![Keyboard Layout Preview](./preview.png)
+
 ## Platforms
 - [Linux](./linux/README.md)
 - [macOS](./macos/README.md)
 - [Windows](./windows/README.md)
-
-![Keyboard Layout Preview](./preview.png)
