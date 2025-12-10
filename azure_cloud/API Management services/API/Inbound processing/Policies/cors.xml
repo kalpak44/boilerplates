@@ -1,0 +1,28 @@
+<policies>
+    <inbound>
+        <cors>
+            <allowed-origins>
+                <origin>*</origin>
+            </allowed-origins>
+            <allowed-methods>
+                <method>*</method>
+            </allowed-methods>
+            <allowed-headers>
+                <header>*</header>
+            </allowed-headers>
+            <expose-headers>
+                <header>*</header>
+            </expose-headers>
+        </cors>
+        <set-header name="X-Request-Id" exists-action="override">
+            <value>@(context.RequestId.ToString())</value>
+        </set-header>
+    </inbound>
+    <backend>
+        <forward-request/>
+    </backend>
+    <outbound/>
+    <on-error/>
+</policies>
+
+
