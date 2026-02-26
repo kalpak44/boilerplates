@@ -1,31 +1,34 @@
-kill-port() {
-  if [ -z "$1" ]; then
-    echo "Usage: kill-port <port>"
-    return 1
-  fi
+# ============================================================
+# Custom CLI helpers
+# Location: ~/.zshrc  (consider moving into ~/.zsh/functions/)
+#
+# Conventions:
+# - Every function has a short header:
+#     # @desc: one-line description
+#     # @usage: how to call it
+#     # @example: concrete example(s)
+# - Prefer return codes:
+#     0 success, 1+ error
+# ============================================================
 
-  PIDS=$(lsof -ti tcp:"$1")
+# Print a formatted error message to stderr
+_err() { print -u2 -- "❌ $*"; }
 
-  if [ -z "$PIDS" ]; then
-    echo "No process is using port $1"
-    return 0
-  fi
+# Print a formatted info message
+_info() { print -- "✅ $*"; }
 
-  echo "Killing the following processes using port $1:"
-  echo "$PIDS"
+# Check if a command exists
+_has() { command -v "$1" >/dev/null 2>&1; }
 
-  echo "$PIDS" | xargs kill -9
-}
-
-git-kalpak44() {
-  if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
-    echo "❌ Not inside a git repository."
-    return 1
-  fi
-
-  git config user.name "Pavel Usanli"
-  git config user.email "pavel.usanli@gmail.com"
-
-  echo "✅ Local git config set:"
-  git config --local --list | grep user.
+# List your custom functions with their @desc lines
+# Usage: zhelp
+zhelp() {
+  local file="${ZDOTDIR:-$HOME}/.zshrc"
+  echo "Custom helpers in: $file"
+  echo "----------------------------------------"
+  # naive parser: finds lines like "fname() {" and the next "# @desc:"
+  awk '
+    /^[a-zA-Z0-9._-]+\(\)[[:space:]]*\{/ { fn=$0; sub(/\(\).*/, "", fn); desc=""; next }
+    /^[[:space:]]*#[[:space:]]*@desc:/ { desc=$0; sub(/.*@desc:[[:space:]]*/, "", desc); if (fn!="") print fn " - " desc }
+  ' "$file" 2>/dev/null | sort
 }
