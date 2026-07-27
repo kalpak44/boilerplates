@@ -11,6 +11,45 @@
 # - Prefer returning non-zero on errors.
 # ============================================================
 
+# ============================================================
+# Port forwarding helpers
+# ============================================================
+
+# @desc: Bind a local TCP port and forward all connections to a remote host/port.
+# @usage: bindport <local_port> <remote_host> <remote_port>
+# @example: bindport 6689 192.168.1.7 6689
+# @example: bindport 8080 localhost 3000
+# @example: bindport 5432 db.internal 5432
+#
+# What it does:
+# - Starts a `socat` TCP listener on 127.0.0.1:<local_port>
+# - Forwards every incoming connection to <remote_host>:<remote_port>
+# - Uses `reuseaddr` to allow quick restarts
+# - Uses `fork` so multiple clients can connect concurrently
+#
+# Notes:
+# - Runs in the foreground (Ctrl+C to stop).
+# - Only listens on localhost (127.0.0.1).
+# - Useful for exposing remote services locally.
+bindport() {
+  if [ "$#" -ne 3 ]; then
+    echo "Usage: bindport <local_port> <remote_host> <remote_port>"
+    return 1
+  fi
+
+  local local_port="$1"
+  local remote_host="$2"
+  local remote_port="$3"
+
+  echo "Forwarding:"
+  echo "  127.0.0.1:${local_port} -> ${remote_host}:${remote_port}"
+  echo "Press Ctrl+C to stop."
+
+  socat \
+    TCP-LISTEN:"$local_port",bind=127.0.0.1,reuseaddr,fork \
+    TCP:"$remote_host":"$remote_port"
+}
+
 
 # ============================================================
 # Process / networking helpers
